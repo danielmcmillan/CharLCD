@@ -1,4 +1,5 @@
 #include "LCDBackend.h"
+#include "LCDController.h"
 
 using namespace CharLCD;
 
@@ -21,8 +22,8 @@ int main(void)
         0
     });
 
-    lcd.clear();
-    lcd.moveCursor(0, 8);
-    lcd.writeChar('A');
+    LCDController controller(std::move(lcd));
+    controller.drawString("Hello world!", {1, 8}, LCDController::TextAlignment::center);
+    controller.update();
     return 0;
 }
