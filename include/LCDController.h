@@ -82,21 +82,25 @@ class LCDController
         int cursorCol;
         int cursorRow;
         std::vector<uint8_t> displayChars;
-        std::array<std::array<uint8_t, 8>, 8> customChars;
+        std::array<Symbol, 8> customChars;
     };
 
     // Char for display buffer. Either raw character, or custom bitmap.
     struct BufferChar
     {
         bool custom;
-        union
-        {
+        union {
             uint8_t rawChar;
             Symbol symbol;
         };
     };
 
+    // Get the index for character at given location
     unsigned indexForLocation(Location location);
+
+    // Update the state of the display with the given characters and custom symbols.
+    // customChars must be no longer than 8
+    void writeToDisplay(const std::vector<uint8_t> &displayChars, const std::vector<Symbol> &customChars);
 
     LCDBackend lcd;
     int numRows;

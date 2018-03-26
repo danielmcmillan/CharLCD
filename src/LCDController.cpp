@@ -1,4 +1,7 @@
 #include "LCDController.h"
+#include <algorithm>
+#include <iterator>
+#include <cassert>
 #include <lcd.h>
 
 namespace CharLCD
@@ -13,8 +16,8 @@ namespace CharLCD
             {},
             {}
         };
-        state.displayChars.resize(numRows * numCols);
-        displayBuffer.resize(numRows * numCols);
+        state.displayChars.resize(numRows * numCols, ' ');
+        displayBuffer.resize(numRows * numCols, {false, {' '}});
 
         this->lcd.power(true);
         this->lcd.clear();
@@ -72,21 +75,79 @@ namespace CharLCD
 
     void LCDController::update()
     {
-        for (int row = 0; row < numRows; ++row)
+        // New screen character data
+        std::vector<uint8_t> displayChars(displayBuffer.size());
+        std::vector<Symbol> customChars;
+
+        for (int i = 0; i < displayBuffer.size(); ++i)
         {
-            for (int col = 0; col < numCols; ++col)
+            const BufferChar &bufferChar = displayBuffer[i];
+            if (bufferChar.custom)
             {
-                int index = indexForLocation({row, col});
-                lcd.moveCursor(row, col);
-                uint8_t c = displayBuffer[index].rawChar;
-                if (c == 0) c = ' ';
-                lcd.writeChar(c);
+                // For symbol, need to reference a custom character
+                std::vector<Symbol>::iterator it = std::find(customChars.begin(), customChars.end(), bufferChar.symbol);
+                if (it != customChars.end())
+                {
+                    // Symbol already exists in customChars
+                    displayChars[i] = std::distance(customChars.begin(), it);
+                }
+                else if (customChars.size() < 8)
+                {
+                    // Add new symbol
+                    displayChars[i] = customChars.size();
+                    customChars.push_back(bufferChar.symbol);
+                }
+                else
+                {
+                    // No room for the symbol
+                    displayChars[i] = ' ';
+                }
+            }
+            else
+            {
+                // Store normal characters directly
+                displayChars[i] = bufferChar.rawChar;
             }
         }
+
+        writeToDisplay(displayChars, customChars);
     }
 
     unsigned LCDController::indexForLocation(Location location)
     {
         return location.row * numCols + location.col;
+    }
+
+    void LCDController::writeToDisplay(const std::vector<uint8_t> &displayChars, const std::vector<Symbol> &customChars)
+    {
+        assert(customChars.size() <= 8);
+        // Write the custom characters
+        for (int i = 0; i < customChars.size(); ++i)
+        {
+            lcd.defineChar(i, customChars[i]);
+            state.customChars[i] = customChars[i];
+        }
+        // Write the screen contents
+        for (int row = 0; row < numRows; ++row)
+        {
+            for (int col = 0; col < numCols; ++col)
+            {
+                int index = indexForLocation({row, col});
+                // Check whether an update is needed at this location
+                if (displayChars[index] != state.displayChars[index])
+                {
+                    // Check whether the cursor needs to be moved
+                    if (state.cursorCol != col || state.cursorRow != row)
+                    {
+                        lcd.moveCursor(row, col);
+                    }
+                    lcd.writeChar(displayChars[index]);
+                    // Cursor moves to the right after writing
+                    state.cursorCol = col + 1;
+                    state.cursorRow = row;
+                }
+            }
+        }
+        state.displayChars = displayChars;
     }
 }
