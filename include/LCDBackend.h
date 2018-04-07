@@ -15,9 +15,9 @@ class LCDBackend
     {
         enum class PinType
         {
-            wiringPi = 0,
-            gpio = 1,
-            board = 2
+            wiringPi = 0, // GPIO pins numbered starting from 0 (see wiringpi docs)
+            gpio = 1, // Broadcom SOC channel numbering
+            board = 2 // Numbers corresponding to pin numbers on the RPi GPIO header
         } pinType;
         bool has4DataPins;
         bool hasBacklightPin;
