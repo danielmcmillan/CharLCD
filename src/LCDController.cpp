@@ -6,6 +6,8 @@
 
 namespace CharLCD
 {
+    const LCDController::BufferChar LCDController::emptyChar = {false, {' '}};
+
     LCDController::LCDController(LCDBackend lcd)
         : lcd(std::move(lcd)), numRows(lcd.getRows()), numCols(lcd.getCols())
     {
@@ -17,7 +19,7 @@ namespace CharLCD
             {}
         };
         state.displayChars.resize(numRows * numCols, ' ');
-        displayBuffer.resize(numRows * numCols, {false, {' '}});
+        displayBuffer.resize(numRows * numCols, emptyChar);
 
         this->lcd.power(true);
         this->lcd.clear();
@@ -71,6 +73,11 @@ namespace CharLCD
         BufferChar bc = {true};
         bc.symbol = symbol;
         displayBuffer[indexForLocation(location)] = bc;
+    }
+
+    void LCDController::clear()
+    {
+        std::fill(displayBuffer.begin(), displayBuffer.end(), emptyChar);
     }
 
     void LCDController::update()

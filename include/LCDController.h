@@ -71,6 +71,11 @@ class LCDController
     void drawSymbol(const Symbol &symbol, Location location);
 
     /**
+     * Clear the display buffer.
+     */
+    void clear();
+
+    /**
      * Write the current display buffer to the display.
      */
     void update();
@@ -94,6 +99,9 @@ class LCDController
             Symbol symbol;
         };
     };
+
+    // BufferChar representing an empty spot
+    static const BufferChar emptyChar;
 
     // Get the index for character at given location
     unsigned indexForLocation(Location location);
