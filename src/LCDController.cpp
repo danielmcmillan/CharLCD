@@ -13,6 +13,7 @@ namespace CharLCD
     {
         state = {
             true,
+            1024,
             -1,
             -1,
         {},
@@ -23,6 +24,7 @@ namespace CharLCD
 
         this->lcd.power(true);
         this->lcd.clear();
+        this->lcd.backlightPower(true);
     }
 
     void LCDController::power(bool on)
@@ -31,6 +33,16 @@ namespace CharLCD
         {
             state.power = on;
             lcd.power(on);
+            lcd.backlightBrightness(on ? state.brightness : 0);
+        }
+    }
+
+    void LCDController::brightness(int brightness)
+    {
+        state.brightness = brightness;
+        if (state.power)
+        {
+            lcd.backlightBrightness(brightness);
         }
     }
 

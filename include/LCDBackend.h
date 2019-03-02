@@ -34,7 +34,7 @@ namespace CharLCD
             int d0;
         };
 
-        LCDBackend(const PinConfig &pinConfig, int rows = 2, int cols = 16);
+        LCDBackend(const PinConfig &pinConfig, int rows = 2, int cols = 16, bool enableBacklightPWM = false);
         LCDBackend(const LCDBackend &that) = delete;
         LCDBackend& operator=(const LCDBackend& that) = delete;
 
@@ -45,10 +45,24 @@ namespace CharLCD
         int getCols() { return cols; }
 
         /**
-         * Turn the display (including the backlight) on or off.
+         * Turn the display on or off.
          * @param on True for on, false for off.
          */
         void power(bool on);
+
+        /**
+         * Turn the display backlight on or off.
+         * If backlight PWM is enabled, powering on will set the brightness to maximum.
+         * @param on True for on, false for off.
+         */
+        void backlightPower(bool on);
+
+        /**
+         * Set the display backlight brightness.
+         * If backlight PWM is not enabled, any non-zero value will turn the backlight on.
+         * @param brightness Value from 0 to 1024.
+         */
+        void backlightBrightness(int brightness);
 
         /**
          * Clear the LCD display.
@@ -85,6 +99,7 @@ namespace CharLCD
     private:
         int lcdHandle;
         int backlightPin;
+        bool enableBacklightPWM;
         int rows;
         int cols;
     };

@@ -41,7 +41,6 @@ Custom symbols are supported, and LCDController manages their storage in display
 
 ## TODO
 
-* Support brightness control of the backlight using hardware PWM
 * Add support for drawing basic primitives to LCDController
 * Improve efficiency by reordering custom symbols to reduce the number of writes required
 * Support alternate LCDBackend implementations

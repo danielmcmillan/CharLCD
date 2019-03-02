@@ -50,10 +50,16 @@ namespace CharLCD
         LCDController(LCDBackend lcd);
 
         /**
-         * Turn the display on or off.
+         * Turn the display and backlight on or off.
          * @param on Whether the display should be on.
          */
         void power(bool on);
+
+        /**
+         * Set the brightness of the display, if supported.
+         * @param brightness Value from 0 to 1024.
+         */
+        void brightness(int brightness);
 
         /**
          * Draw a string to the display buffer.
@@ -84,6 +90,7 @@ namespace CharLCD
         struct DisplayState
         {
             bool power;
+            int brightness;
             int cursorCol;
             int cursorRow;
             std::vector<uint8_t> displayChars;

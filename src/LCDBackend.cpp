@@ -4,7 +4,8 @@
 
 namespace CharLCD
 {
-    LCDBackend::LCDBackend(const PinConfig &pinConfig, int rows, int cols) : rows(rows), cols(cols)
+    LCDBackend::LCDBackend(const PinConfig &pinConfig, int rows, int cols, bool enableBacklightPWM)
+        : rows(rows), cols(cols), enableBacklightPWM(enableBacklightPWM)
     {
         // Setup WiringPi with pin number type specified in pinConfig
         switch (pinConfig.pinType)
@@ -33,9 +34,14 @@ namespace CharLCD
         if (pinConfig.hasBacklightPin)
         {
             backlightPin = pinConfig.backlight;
-            pinMode(backlightPin, OUTPUT);
-            // Defaults to display on
-            digitalWrite(backlightPin, true);
+            if (enableBacklightPWM)
+            {
+                pinMode(backlightPin, PWM_OUTPUT);
+            }
+            else
+            {
+                pinMode(backlightPin, OUTPUT);
+            }
         }
         else
         {
@@ -49,6 +55,7 @@ namespace CharLCD
         backlightPin = that.backlightPin;
         rows = that.rows;
         cols = that.cols;
+        enableBacklightPWM = that.enableBacklightPWM;
 
         that.lcdHandle = -1;
         that.backlightPin = -1;
@@ -60,6 +67,7 @@ namespace CharLCD
         backlightPin = that.backlightPin;
         rows = that.rows;
         cols = that.cols;
+        enableBacklightPWM = that.enableBacklightPWM;
 
         that.lcdHandle = -1;
         that.backlightPin = -1;
@@ -69,9 +77,35 @@ namespace CharLCD
     void LCDBackend::power(bool on)
     {
         lcdDisplay(lcdHandle, on);
+    }
+
+    void LCDBackend::backlightPower(bool on)
+    {
         if (backlightPin >= 0)
         {
-            digitalWrite(backlightPin, on);
+            if (enableBacklightPWM)
+            {
+                pwmWrite(backlightPin, on ? 1024 : 0);
+            }
+            else
+            {
+                digitalWrite(backlightPin, on ? 1 : 0);
+            }
+        }
+    }
+
+    void LCDBackend::backlightBrightness(int brightness)
+    {
+        if (backlightPin >= 0)
+        {
+            if (enableBacklightPWM)
+            {
+                pwmWrite(backlightPin, brightness);
+            }
+            else
+            {
+                digitalWrite(backlightPin, brightness != 0 ? 1 : 0);
+            }
         }
     }
 
