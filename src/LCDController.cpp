@@ -15,8 +15,8 @@ namespace CharLCD
             true,
             -1,
             -1,
-            {},
-            {}
+        {},
+        {}
         };
         state.displayChars.resize(numRows * numCols, ' ');
         displayBuffer.resize(numRows * numCols, emptyChar);

@@ -1,4 +1,4 @@
-Library that provides a C++ interface for an LCD display controlled by a HD44780, using wiringpi for Raspberry Pi as a backend.
+Library that provides a C++ interface for an LCD display controlled by a HD44780, using wiringpi for Raspberry Pi for hardware functions.
 
 Provides LCDBackend with basic low-level support for LCD functions, and LCDController that provides a higher-level interface and buffers display data.
 
@@ -38,3 +38,10 @@ controller.update();
 ```
 
 Custom symbols are supported, and LCDController manages their storage in display memory automatically (see `bounce.cpp` for example usage). Some predefined symbols are provided in `Symbols.h`.
+
+## TODO
+
+* Support brightness control of the backlight using hardware PWM
+* Add support for drawing basic primitives to LCDController
+* Improve efficiency by reordering custom symbols to reduce the number of writes required
+* Support alternate LCDBackend implementations
