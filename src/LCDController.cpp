@@ -131,8 +131,11 @@ namespace CharLCD
         // Write the custom characters
         for (int i = 0; i < customChars.size(); ++i)
         {
-            lcd.defineChar(i, customChars[i]);
-            state.customChars[i] = customChars[i];
+            if (customChars[i] != state.customChars[i])
+            {
+                lcd.defineChar(i, customChars[i]);
+                state.customChars[i] = customChars[i];
+            }
         }
         // Write the screen contents
         for (int row = 0; row < numRows; ++row)
